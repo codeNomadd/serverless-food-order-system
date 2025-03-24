@@ -304,10 +304,10 @@ The system includes comprehensive monitoring:
 
 ### Implemented ✅
 - **API Gateway Throttling Configured**: Rate limiting is set up to protect against excessive requests and prevent billing spikes.
+- **DynamoDB Auto Scaling & Backups**: Enabled auto-scaling (5-20 units) for both read and write capacity, with Point-in-Time Recovery (PITR) configured for continuous 35-day backup protection.
 
 ### Planned Improvements
 - **CloudWatch Monitoring & Alarms**: Enable detailed monitoring of Lambda execution time, error rates, and throttling. Set CloudWatch Alarms to notify when errors or high usage occur.
-- **DynamoDB Auto Scaling**: Configure automatic scaling of read/write capacity for the DynamoDB table based on traffic patterns.
 - **AWS WAF Integration**: Attach AWS Web Application Firewall (WAF) to the API Gateway to protect against bots, SQL injections, XSS attacks, and spammers.
 - **CloudFront CDN**: Add CloudFront caching for the frontend and API responses to reduce latency and Lambda invocations under high load.
 - **AWS Budgets & Cost Monitoring**: Set budget alerts to avoid unexpected costs if the API gets discovered and heavily used.
