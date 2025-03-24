@@ -9,6 +9,8 @@ A serverless food ordering system built with AWS Lambda, API Gateway, DynamoDB, 
   - Amazon API Gateway (REST API)
   - Amazon DynamoDB (NoSQL Database)
   - IAM (Security & Permissions)
+  - CloudWatch (Monitoring & Alerts)
+  - SNS (Notifications)
 
 - **Frontend**
   - HTML5, CSS3, JavaScript
@@ -29,6 +31,18 @@ A serverless food ordering system built with AWS Lambda, API Gateway, DynamoDB, 
                                               │  DynamoDB    │
                                               │   Table      │
                                               └──────────────┘
+                                                      │
+                                                      ▼
+                                              ┌──────────────┐
+                                              │  CloudWatch  │
+                                              │  Monitoring  │
+                                              └──────────────┘
+                                                      │
+                                                      ▼
+                                              ┌──────────────┐
+                                              │     SNS      │
+                                              │   Alerts     │
+                                              └──────────────┘
 ```
 
 1. **Frontend Layer**
@@ -44,7 +58,8 @@ A serverless food ordering system built with AWS Lambda, API Gateway, DynamoDB, 
 3. **Backend Layer**
    - Serverless Lambda function
    - DynamoDB for data persistence
-   - CloudWatch for logging
+   - CloudWatch for logging and monitoring
+   - SNS for error notifications
 
 ## 📁 Project Structure
 
@@ -60,6 +75,7 @@ food-delivery/
 ├── infra/                    # Infrastructure policies
 │   └── trust-policy.json     # IAM trust policy for Lambda
 ├── s3-bucket-policy.json     # S3 bucket policy
+├── LICENSE                   # MIT License
 └── README.md                 # Project documentation
 ```
 
@@ -163,6 +179,34 @@ aws s3 website --index-document index.html --error-document error.html s3://food
 aws s3 cp frontend/ s3://food-delivery-frontend/ --recursive
 ```
 
+### 4. Monitoring Setup
+
+```bash
+# Create SNS topic for alerts
+aws sns create-topic --name FoodDeliveryAlerts
+
+# Subscribe email to SNS topic
+aws sns subscribe \
+    --topic-arn arn:aws:sns:ap-northeast-2:147997129747:FoodDeliveryAlerts \
+    --protocol email \
+    --notification-endpoint your-email@example.com
+
+# Create CloudWatch alarm
+aws cloudwatch put-metric-alarm \
+    --alarm-name "Lambda-FoodDelivery-Error-Alarm" \
+    --metric-name "Errors" \
+    --namespace "AWS/Lambda" \
+    --statistic "Sum" \
+    --period 300 \
+    --threshold 1 \
+    --comparison-operator "GreaterThanOrEqualToThreshold" \
+    --dimensions Name=FunctionName,Value=FoodDeliveryFunction \
+    --evaluation-periods 1 \
+    --alarm-actions arn:aws:sns:ap-northeast-2:147997129747:FoodDeliveryAlerts \
+    --ok-actions arn:aws:sns:ap-northeast-2:147997129747:FoodDeliveryAlerts \
+    --alarm-description "Alarm if Lambda FoodDeliveryFunction has any errors."
+```
+
 ## 🧪 Testing
 
 ### Create Order
@@ -210,6 +254,25 @@ The Lambda function uses the following IAM role:
 
 Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.ap-northeast-2.amazonaws.com/index.html)
 
+## 📊 Monitoring & Alerts
+
+The system includes comprehensive monitoring:
+
+1. **CloudWatch Metrics**
+   - Lambda function errors
+   - API Gateway latency
+   - DynamoDB throughput
+
+2. **Error Alerting**
+   - SNS notifications for Lambda errors
+   - 5-minute evaluation periods
+   - Email notifications for incidents
+
+3. **Logging**
+   - Lambda function logs
+   - API Gateway access logs
+   - DynamoDB operation logs
+
 ## ✅ Future Improvements
 
 - [ ] User Authentication
@@ -246,4 +309,5 @@ MIT License - feel free to use this project for your own purposes.
 - The project follows AWS best practices for serverless architecture
 - All components are properly documented and commented
 - The frontend is optimized for mobile and desktop viewing
-- Error handling and validation are implemented throughout 
+- Error handling and validation are implemented throughout
+- Comprehensive monitoring and alerting system in place 
