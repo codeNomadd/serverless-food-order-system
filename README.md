@@ -300,6 +300,20 @@ The system includes comprehensive monitoring:
   - Order status tracking
   - Payment history
 
+## 🚀 Further Enhancements
+
+### Implemented ✅
+- **API Gateway Throttling Configured**: Rate limiting is set up to protect against excessive requests and prevent billing spikes.
+
+### Planned Improvements
+- **CloudWatch Monitoring & Alarms**: Enable detailed monitoring of Lambda execution time, error rates, and throttling. Set CloudWatch Alarms to notify when errors or high usage occur.
+- **DynamoDB Auto Scaling**: Configure automatic scaling of read/write capacity for the DynamoDB table based on traffic patterns.
+- **AWS WAF Integration**: Attach AWS Web Application Firewall (WAF) to the API Gateway to protect against bots, SQL injections, XSS attacks, and spammers.
+- **CloudFront CDN**: Add CloudFront caching for the frontend and API responses to reduce latency and Lambda invocations under high load.
+- **AWS Budgets & Cost Monitoring**: Set budget alerts to avoid unexpected costs if the API gets discovered and heavily used.
+- **API Key & Usage Plans**: Strengthen API access control by requiring API keys and setting usage plans with quotas and rate limits.
+- **Domain Name & HTTPS**: Use Route53 and AWS Certificate Manager (ACM) to add a custom domain with HTTPS for a production-grade professional deployment.
+
 ## 📝 License
 
 MIT License - feel free to use this project for your own purposes.
