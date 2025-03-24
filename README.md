@@ -1,6 +1,50 @@
 # 🍽️ Food Delivery REST API
 
-A serverless food delivery system built with AWS Lambda, API Gateway, and DynamoDB.
+A serverless food ordering system built with AWS Lambda, API Gateway, DynamoDB, and S3. This project demonstrates a modern, scalable architecture for handling food delivery orders with a responsive frontend.
+
+## 📐 Tech Stack
+
+- **Backend**
+  - AWS Lambda (Python 3.12)
+  - Amazon API Gateway (REST API)
+  - Amazon DynamoDB (NoSQL Database)
+  - IAM (Security & Permissions)
+
+- **Frontend**
+  - HTML5, CSS3, JavaScript
+  - Tailwind CSS for styling
+  - Axios for API calls
+  - SweetAlert2 for enhanced UX
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Frontend      │     │   API        │     │   Lambda     │
+│   (S3 Static)   │────▶│   Gateway    │────▶│   Function   │
+└─────────────────┘     └──────────────┘     └──────────────┘
+                                                      │
+                                                      ▼
+                                              ┌──────────────┐
+                                              │  DynamoDB    │
+                                              │   Table      │
+                                              └──────────────┘
+```
+
+1. **Frontend Layer**
+   - Static website hosted on S3
+   - Responsive design with Tailwind CSS
+   - Client-side validation and error handling
+
+2. **API Layer**
+   - RESTful endpoints (/order)
+   - CORS support for cross-origin requests
+   - Request/response validation
+
+3. **Backend Layer**
+   - Serverless Lambda function
+   - DynamoDB for data persistence
+   - CloudWatch for logging
 
 ## 📁 Project Structure
 
@@ -13,40 +57,16 @@ food-delivery/
 │   ├── index.html            # Main HTML file
 │   ├── styles.css            # CSS styles
 │   └── scripts.js            # Frontend JavaScript
-└── infra/                    # Infrastructure policies
-    └── trust-policy.json     # IAM trust policy for Lambda
+├── infra/                    # Infrastructure policies
+│   └── trust-policy.json     # IAM trust policy for Lambda
+├── s3-bucket-policy.json     # S3 bucket policy
+└── README.md                 # Project documentation
 ```
-
-## 🏗️ Architecture
-
-### Backend Flow
-1. API Gateway receives HTTP requests
-2. Lambda function processes requests:
-   - POST /order: Creates new order in DynamoDB
-   - GET /order: Retrieves order details
-   - OPTIONS: Handles CORS preflight
-3. DynamoDB stores and retrieves order data
-
-### Frontend Flow
-1. Static files hosted on S3
-2. HTML/JS makes API calls to API Gateway
-3. User interface updates based on API responses
-4. CORS enabled for secure cross-origin requests
-
-### IAM Role & Permissions
-- `FoodDeliveryLambdaRole`: Allows Lambda to:
-  - Access DynamoDB (PutItem, GetItem)
-  - Write CloudWatch Logs
-  - Execute with proper security context
-
-### S3 Static Hosting
-- Frontend files served from S3 bucket
-- Configured for static website hosting
-- CORS enabled for API communication
 
 ## 🚀 Setup & Deployment
 
 ### 1. Backend Setup
+
 ```bash
 # Create DynamoDB table
 aws dynamodb create-table \
@@ -77,6 +97,7 @@ aws lambda create-function \
 ```
 
 ### 2. API Gateway Setup
+
 ```bash
 # Create REST API
 aws apigateway create-rest-api \
@@ -130,6 +151,7 @@ aws apigateway update-stage \
 ```
 
 ### 3. Frontend Deployment
+
 ```bash
 # Create S3 bucket
 aws s3 mb s3://food-delivery-frontend
@@ -155,7 +177,7 @@ curl -X POST https://ptwq1ckzk7.execute-api.ap-northeast-2.amazonaws.com/prod/or
 curl https://ptwq1ckzk7.execute-api.ap-northeast-2.amazonaws.com/prod/order?orderId=123
 ```
 
-## 🔒 IAM Execution Role & Permissions
+## 🔒 IAM Role & Permissions
 
 The Lambda function uses the following IAM role:
 
@@ -184,6 +206,44 @@ The Lambda function uses the following IAM role:
 }
 ```
 
+## 🌐 Live Demo
+
+Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.ap-northeast-2.amazonaws.com/index.html)
+
+## ✅ Future Improvements
+
+- [ ] User Authentication
+  - Signup/Login functionality
+  - JWT token-based auth
+  - User profile management
+
+- [ ] Admin Dashboard
+  - Order management
+  - Analytics and reporting
+  - User management
+
+- [ ] Enhanced Security
+  - HTTPS via Route53 and CloudFront
+  - API key authentication
+  - Rate limiting
+
+- [ ] Development Experience
+  - Docker for local testing
+  - CI/CD pipeline
+  - Automated testing
+
+- [ ] Payment Integration
+  - Stripe/PayPal integration
+  - Order status tracking
+  - Payment history
+
 ## 📝 License
 
-MIT License 
+MIT License - feel free to use this project for your own purposes.
+
+## 📢 Notes
+
+- The project follows AWS best practices for serverless architecture
+- All components are properly documented and commented
+- The frontend is optimized for mobile and desktop viewing
+- Error handling and validation are implemented throughout 
