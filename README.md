@@ -65,6 +65,7 @@ This project is designed to demonstrate AWS best practices while maintaining a b
 - ✅ DynamoDB access scoped to specific operations
 - ✅ API Gateway with CORS protection
 - ✅ Secure S3 bucket configuration
+- ✅ Encryption at rest enabled for DynamoDB (SSESpecification)
 - ⚠️ Note: WAF and API keys omitted as they're not essential for skill demonstration
 
 ### 3️⃣ Reliability
@@ -73,6 +74,7 @@ This project is designed to demonstrate AWS best practices while maintaining a b
 - ✅ CloudWatch alarms for errors and throttles
 - ✅ SNS notifications for critical events
 - ✅ Error retry mechanisms in Lambda
+- ⚠️ Note: Multi-region deployment is not implemented, but can be added for high availability in production environments
 
 ### 4️⃣ Performance Efficiency
 - ✅ Serverless architecture for optimal scaling
