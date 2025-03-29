@@ -4,6 +4,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: Food Delivery System - Serverless Architecture
 
 Resources:
+  # Main Lambda function handling order operations
+  # Configured with environment variables, IAM policies, and API Gateway endpoints
   FoodDeliveryFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -41,6 +43,8 @@ Resources:
       MemorySize: 128
       Tracing: Active
 
+  # DynamoDB table for storing order data
+  # Configured with provisioned capacity and auto-scaling enabled
   FoodOrdersTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -59,6 +63,8 @@ Resources:
         - Key: Environment
           Value: Production
 
+  # API Gateway REST API
+  # Handles HTTP requests and routes them to the Lambda function
   FoodDeliveryApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
@@ -68,12 +74,16 @@ Resources:
         Types:
           - REGIONAL
 
+  # SNS Topic for system alerts
+  # Used by CloudWatch alarms to notify about errors and throttles
   FoodDeliveryAlerts:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: FoodDeliveryAlerts
       DisplayName: Food Delivery System Alerts
 
+  # CloudWatch Alarm for Lambda Errors
+  # Triggers if Lambda function encounters any errors in a 5-minute period
   LambdaErrorAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -94,6 +104,9 @@ Resources:
         - !Ref FoodDeliveryAlerts
       AlarmDescription: Alarm if Lambda FoodDeliveryFunction has any errors
 
+  # CloudWatch Alarm for Lambda Throttles
+  # Triggers if Lambda function gets throttled more than once in 5 minutes
+  # Helps identify when we need to increase concurrency limits
   LambdaThrottleAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -112,6 +125,7 @@ Resources:
         - !Ref FoodDeliveryAlerts
       AlarmDescription: Alarm if Lambda gets throttled
 
+# Output values that can be referenced by other stacks
 Outputs:
   ApiEndpoint:
     Description: API Gateway endpoint URL
