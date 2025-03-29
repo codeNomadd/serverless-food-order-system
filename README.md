@@ -314,41 +314,13 @@ Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.a
 - **X-Ray Tracing**: Distributed tracing for request flow analysis
 - **Cost Attribution**: Resource tagging for cost tracking and optimization
 
-## ✅ Future Improvements
+## 🧭 Project Scope & Possible Extensions
 
-- [ ] User Authentication
-  - Signup/Login functionality
-  - JWT token-based auth
-  - User profile management
+This project is designed as a cloud infrastructure and DevOps showcase, focusing on system architecture, AWS service integration, and the principles of the AWS Well-Architected Framework.
 
-- [ ] Admin Dashboard
-  - Order management
-  - Analytics and reporting
-  - User management
+Common production-level features such as user authentication, API key enforcement, WAF integration, custom domain setup with Route53, CloudFront CDN, payment processing, and a full admin dashboard are intentionally omitted. These components, while important in real-world applications, are not required for demonstrating the core infrastructure and system design skills this project aims to highlight.
 
-- [ ] Enhanced Security
-  - HTTPS via Route53 and CloudFront
-  - API key authentication
-  - Rate limiting
-
-- [ ] Development Experience
-  - Docker for local testing
-  - CI/CD pipeline
-  - Automated testing
-
-- [ ] Payment Integration
-  - Stripe/PayPal integration
-  - Order status tracking
-  - Payment history
-
-## 🚀 Further Enhancements
-
-### Implemented ✅
-- **API Gateway Throttling Configured**: Rate limiting is set up to protect against excessive requests and prevent billing spikes.
-- **DynamoDB Auto Scaling & Backups**: Enabled auto-scaling (5-20 units) for both read and write capacity, with Point-in-Time Recovery (PITR) configured for continuous 35-day backup protection.
-
-### Planned Improvements
-- **CloudWatch Monitoring & Alarms**: Enable detailed monitoring of Lambda execution time, error rates, and throttling. Set CloudWatch Alarms to notify when errors or high usage occur.
+Such features could be added for a production deployment but are considered out of scope for this portfolio-focused project.
 
 ## 📝 License
 
