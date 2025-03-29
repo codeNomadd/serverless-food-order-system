@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Food Delivery System - Serverless Architecture
+
+Resources:
+  FoodDeliveryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: backend/lambda_function.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref FoodOrdersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FoodOrdersTable
+        - CloudWatchLogsFullAccess
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt FoodDeliveryAlerts.TopicName
+      Events:
+        OrderAPI:
+          Type: Api
+          Properties:
+            Path: /order
+            Method: post
+            RestApiId: !Ref FoodDeliveryApi
+        GetOrderAPI:
+          Type: Api
+          Properties:
+            Path: /order
+            Method: get
+            RestApiId: !Ref FoodDeliveryApi
+        OptionsAPI:
+          Type: Api
+          Properties:
+            Path: /order
+            Method: options
+            RestApiId: !Ref FoodDeliveryApi
+      Timeout: 30
+      MemorySize: 128
+      Tracing: Active
+
+  FoodOrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FoodOrders
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      Tags:
+        - Key: Environment
+          Value: Production
+
+  FoodDeliveryApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: FoodDeliveryAPI
+      Description: Food Delivery REST API
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  FoodDeliveryAlerts:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: FoodDeliveryAlerts
+      DisplayName: Food Delivery System Alerts
+
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: Lambda-FoodDelivery-Error-Alarm
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref FoodDeliveryFunction
+      EvaluationPeriods: 1
+      AlarmActions:
+        - !Ref FoodDeliveryAlerts
+      OKActions:
+        - !Ref FoodDeliveryAlerts
+      AlarmDescription: Alarm if Lambda FoodDeliveryFunction has any errors
+
+  LambdaThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: Lambda-Throttle-Alarm
+      MetricName: Throttles
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref FoodDeliveryFunction
+      EvaluationPeriods: 1
+      AlarmActions:
+        - !Ref FoodDeliveryAlerts
+      AlarmDescription: Alarm if Lambda gets throttled
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${FoodDeliveryApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/order"
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref FoodDeliveryFunction
+  TableName:
+    Description: DynamoDB Table Name
+    Value: !Ref FoodOrdersTable 

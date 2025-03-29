@@ -81,7 +81,19 @@ food-delivery/
 
 ## 🚀 Setup & Deployment
 
-### 1. Backend Setup
+### Option 1: SAM Template Deployment (Recommended)
+```bash
+# Install AWS SAM CLI
+brew install aws-sam-cli
+
+# Build and deploy using SAM
+sam build
+sam deploy --guided
+
+# Follow the prompts to configure your deployment
+```
+
+### Option 2: Manual CLI Deployment
 
 ```bash
 # Create DynamoDB table
@@ -254,24 +266,22 @@ The Lambda function uses the following IAM role:
 
 Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.ap-northeast-2.amazonaws.com/index.html)
 
-## 📊 Monitoring & Alerts
+## 📊 Monitoring & Observability
 
-The system includes comprehensive monitoring:
+### CloudWatch Logs
+- Log retention period: 14 days
+- Structured logging implemented for all Lambda operations
+- Logs include request/response details and error information
 
-1. **CloudWatch Metrics**
-   - Lambda function errors
-   - API Gateway latency
-   - DynamoDB throughput
+### CloudWatch Alarms
+- **Error Monitoring**: Alerts on Lambda function errors
+- **Throttle Monitoring**: Alerts on Lambda function throttling
+- **Notification Channel**: SNS topic for alert delivery
 
-2. **Error Alerting**
-   - SNS notifications for Lambda errors
-   - 5-minute evaluation periods
-   - Email notifications for incidents
-
-3. **Logging**
-   - Lambda function logs
-   - API Gateway access logs
-   - DynamoDB operation logs
+### Performance Metrics
+- Lambda execution time
+- DynamoDB read/write capacity utilization
+- API Gateway request counts and latency
 
 ## ✅ Future Improvements
 
