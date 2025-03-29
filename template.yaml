@@ -14,12 +14,14 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref FoodOrdersTable
+          POWERTOOLS_SERVICE_NAME: FoodDelivery
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FoodOrdersTable
         - CloudWatchLogsFullAccess
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt FoodDeliveryAlerts.TopicName
+        - XRayWriteOnlyPolicy
       Events:
         OrderAPI:
           Type: Api
@@ -42,9 +44,14 @@ Resources:
       Timeout: 30
       MemorySize: 128
       Tracing: Active
+      Tags:
+        Environment: Production
+        Project: FoodDelivery
+        ManagedBy: SAM
+        CostCenter: FoodDelivery
 
   # DynamoDB table for storing order data
-  # Configured with provisioned capacity and auto-scaling enabled
+  # Configured with provisioned capacity, encryption, and auto-scaling enabled
   FoodOrdersTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -59,9 +66,15 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+      SSESpecification:
+        Enabled: true
       Tags:
         - Key: Environment
           Value: Production
+        - Key: Project
+          Value: FoodDelivery
+        - Key: CostCenter
+          Value: FoodDelivery
 
   # API Gateway REST API
   # Handles HTTP requests and routes them to the Lambda function

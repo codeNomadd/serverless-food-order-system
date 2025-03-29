@@ -4,6 +4,8 @@ import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
 from botocore.config import Config
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
 
 # Configure logging
 logger = logging.getLogger()
@@ -16,7 +18,11 @@ config = Config(
         mode = 'standard'
     )
 )
+
+# Initialize AWS clients with X-Ray
+patch_all()
 dynamodb = boto3.resource('dynamodb', config=config)
+cloudwatch = boto3.client('cloudwatch')
 table = dynamodb.Table('FoodOrders')
 
 # Global variables for connection reuse
@@ -30,13 +36,30 @@ def get_dynamodb():
         table = dynamodb.Table('FoodOrders')
     return table
 
+def record_order_metric(order_value):
+    """Record custom metric for order value"""
+    try:
+        cloudwatch.put_metric_data(
+            Namespace='FoodDelivery',
+            MetricData=[
+                {
+                    'MetricName': 'OrderValue',
+                    'Value': order_value,
+                    'Unit': 'USD',
+                    'Timestamp': datetime.utcnow()
+                }
+            ]
+        )
+    except Exception as e:
+        logger.error(f"Failed to record order metric: {str(e)}")
+
+@xray_recorder.capture('lambda_handler')
 def lambda_handler(event, context):
+    # Get the HTTP method from the request
+    http_method = event['httpMethod']
     logger.info('Received event: %s', json.dumps(event))
     
     try:
-        # Get the HTTP method from the request
-        http_method = event['httpMethod']
-
         # Handle CORS preflight requests
         if http_method == 'OPTIONS':
             return build_cors_response()
@@ -46,8 +69,19 @@ def lambda_handler(event, context):
             body = json.loads(event['body'])
             order_id = body['orderId']
             item = body['item']
-            table.put_item(Item={'orderId': order_id, 'item': item})
-            logger.info('Successfully processed order: %s', order_id)
+            price = body.get('price', 0)  # Default to 0 if not provided
+            
+            table.put_item(Item={
+                'orderId': order_id,
+                'item': item,
+                'price': price,
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            
+            # Record order value metric
+            record_order_metric(price)
+            
+            logger.info(f"Successfully processed order: {order_id}")
             return build_response(200, f"Order {order_id} for {item} received.")
 
         # Get order details
@@ -61,7 +95,7 @@ def lambda_handler(event, context):
 
         return build_response(400, 'Unsupported HTTP method')
     except Exception as e:
-        logger.error('Error processing order: %s', str(e))
+        logger.error(f"Error processing request: {str(e)}")
         return build_response(500, 'Internal server error')
 
 def build_cors_response():

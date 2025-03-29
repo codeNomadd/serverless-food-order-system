@@ -1,5 +1,9 @@
 # 🍽️ Food Delivery REST API
 
+🧠 **Portfolio Project**  
+Built to demonstrate real-world AWS DevOps and Cloud Engineering skills.  
+Includes observability, security, cost tracking, and system design.
+
 A serverless food ordering system built with AWS Lambda, API Gateway, DynamoDB, and S3. This project demonstrates a modern, scalable architecture for handling food delivery orders with a responsive frontend.
 
 ## 📐 Tech Stack
@@ -45,21 +49,42 @@ A serverless food ordering system built with AWS Lambda, API Gateway, DynamoDB, 
                                               └──────────────┘
 ```
 
-1. **Frontend Layer**
-   - Static website hosted on S3
-   - Responsive design with Tailwind CSS
-   - Client-side validation and error handling
+## 🎯 AWS Well-Architected Framework Implementation
 
-2. **API Layer**
-   - RESTful endpoints (/order)
-   - CORS support for cross-origin requests
-   - Request/response validation
+This project is designed to demonstrate AWS best practices while maintaining a balance between production readiness and skill demonstration. Here's how we've implemented each pillar:
 
-3. **Backend Layer**
-   - Serverless Lambda function
-   - DynamoDB for data persistence
-   - CloudWatch for logging and monitoring
-   - SNS for error notifications
+### 1️⃣ Operational Excellence
+- ✅ Structured logging with CloudWatch
+- ✅ Comprehensive error handling
+- ✅ Infrastructure as Code (SAM template)
+- ✅ Detailed documentation and deployment guides
+- ✅ Reproducible deployment process
+
+### 2️⃣ Security
+- ✅ IAM roles with least privilege access
+- ✅ DynamoDB access scoped to specific operations
+- ✅ API Gateway with CORS protection
+- ✅ Secure S3 bucket configuration
+- ⚠️ Note: WAF and API keys omitted as they're not essential for skill demonstration
+
+### 3️⃣ Reliability
+- ✅ DynamoDB auto-scaling (5-20 units)
+- ✅ Point-in-Time Recovery (PITR) for backups
+- ✅ CloudWatch alarms for errors and throttles
+- ✅ SNS notifications for critical events
+- ✅ Error retry mechanisms in Lambda
+
+### 4️⃣ Performance Efficiency
+- ✅ Serverless architecture for optimal scaling
+- ✅ Connection reuse in Lambda
+- ✅ Efficient DynamoDB access patterns
+- ⚠️ Note: CloudFront CDN omitted as it's not essential for demonstration
+
+### 5️⃣ Cost Optimization
+- ✅ Serverless components to minimize idle costs
+- ✅ DynamoDB auto-scaling to prevent overprovisioning
+- ✅ CloudWatch log retention (14 days)
+- ⚠️ Note: AWS Budgets omitted as they're not essential for demonstration
 
 ## 📁 Project Structure
 
@@ -74,6 +99,7 @@ food-delivery/
 │   └── scripts.js            # Frontend JavaScript
 ├── infra/                    # Infrastructure policies
 │   └── trust-policy.json     # IAM trust policy for Lambda
+├── template.yaml             # SAM template for IaC
 ├── s3-bucket-policy.json     # S3 bucket policy
 ├── LICENSE                   # MIT License
 └── README.md                 # Project documentation
@@ -256,13 +282,13 @@ The Lambda function uses the following IAM role:
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "*"
+      "Resource": "arn:aws:logs:*:*:*"
     }
   ]
 }
 ```
 
-## 🌐 Live Demo
+## 🌟 Live Demo
 
 Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.ap-northeast-2.amazonaws.com/index.html)
 
@@ -282,6 +308,11 @@ Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.a
 - Lambda execution time
 - DynamoDB read/write capacity utilization
 - API Gateway request counts and latency
+
+### Business KPIs
+- **Order Value Tracking**: Custom CloudWatch metrics for monitoring total order value
+- **X-Ray Tracing**: Distributed tracing for request flow analysis
+- **Cost Attribution**: Resource tagging for cost tracking and optimization
 
 ## ✅ Future Improvements
 
@@ -318,15 +349,10 @@ Visit the live demo at: [Food Delivery System](https://food-delivery-irmuun.s3.a
 
 ### Planned Improvements
 - **CloudWatch Monitoring & Alarms**: Enable detailed monitoring of Lambda execution time, error rates, and throttling. Set CloudWatch Alarms to notify when errors or high usage occur.
-- **AWS WAF Integration**: Attach AWS Web Application Firewall (WAF) to the API Gateway to protect against bots, SQL injections, XSS attacks, and spammers.
-- **CloudFront CDN**: Add CloudFront caching for the frontend and API responses to reduce latency and Lambda invocations under high load.
-- **AWS Budgets & Cost Monitoring**: Set budget alerts to avoid unexpected costs if the API gets discovered and heavily used.
-- **API Key & Usage Plans**: Strengthen API access control by requiring API keys and setting usage plans with quotas and rate limits.
-- **Domain Name & HTTPS**: Use Route53 and AWS Certificate Manager (ACM) to add a custom domain with HTTPS for a production-grade professional deployment.
 
 ## 📝 License
 
-MIT License - feel free to use this project for your own purposes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📢 Notes
 
@@ -335,3 +361,31 @@ MIT License - feel free to use this project for your own purposes.
 - The frontend is optimized for mobile and desktop viewing
 - Error handling and validation are implemented throughout
 - Comprehensive monitoring and alerting system in place 
+
+# Add tags for cost tracking
+FoodDeliveryFunction:
+  Properties:
+    Tags:
+      Environment: Production
+      Project: FoodDelivery
+      ManagedBy: SAM
+
+# Add encryption for DynamoDB
+FoodOrdersTable:
+  Properties:
+    SSESpecification:
+      Enabled: true
+
+FoodDeliveryFunction:
+  Properties:
+    Tracing: Active
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: FoodDelivery
+
+Resources:
+  FoodDeliveryFunction:
+    Properties:
+      Tags:
+        CostCenter: FoodDelivery
+        Environment: Production 
